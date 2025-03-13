@@ -3,7 +3,7 @@ using UnityEngine;
 public class allume : MonoBehaviour
 {
 	private Renderer objectRenderer; // Référence au renderer de l'objet
-	public float detectionRadius = 3f; // Distance de détection
+	public float detectionRadius ; // Distance de détection
 	public Bouge valise;
 	private Material outlineMaterial;
 	private bool isHighlighted = false;
@@ -14,6 +14,7 @@ public class allume : MonoBehaviour
 	void Start()
 	{
 		actualise();
+		detectionRadius = valise.interactionDistance;
 	}
 
 	void Update()
@@ -28,6 +29,10 @@ public class allume : MonoBehaviour
 
 			if (distance <= detectionRadius)
 			{
+				float distanceToJo = Vector3.Distance(transform.position, valise.jo.transform.position);
+
+				// Afficher la distance au moment du calcul dans la console
+				Debug.Log("Distance e : " + distanceToJo);
 				if (!isHighlighted)
 				{
 					ActivateOutline(true);
@@ -38,7 +43,7 @@ public class allume : MonoBehaviour
 				ActivateOutline(false);
 			}
 		}
-		else
+		else if (valise.jo.transform != this.transform)
 		{
 			ActivateOutline(false);
 		}
@@ -74,7 +79,7 @@ public class allume : MonoBehaviour
 						canGive = false;
 						break;
 					case "Elec":
-						canGive = true;
+						canGive = false;
 						break;
 					case "Dict":
 						canGive = true;
@@ -103,13 +108,13 @@ public class allume : MonoBehaviour
 						canGive = true;
 						break;
 					case "Dict":
-						canGive = true;
+						canGive = false;
 						break;
 					case "Bag":
-						canGive = true;
+						canGive = false;
 						break;
 					case "Amb":
-						canGive = true;
+						canGive = false;
 						break;
 				}
 				break;
@@ -117,19 +122,19 @@ public class allume : MonoBehaviour
 				switch (rolejo)
 				{
 					case "Espion":
-						canGive = true;
+						canGive = false;
 						break;
 					case "Guarde":
 						canGive = false;
 						break;
 					case "Elec":
-						canGive = true;
+						canGive = false;
 						break;
 					case "Dict":
 						canGive = true;
 						break;
 					case "Bag":
-						canGive = true;
+						canGive = false;
 						break;
 					case "Amb":
 						canGive = true;
@@ -163,13 +168,13 @@ public class allume : MonoBehaviour
 				switch (rolejo)
 				{
 					case "Espion":
-						canGive = true;
+						canGive = false;
 						break;
 					case "Guarde":
 						canGive = false;
 						break;
 					case "Elec":
-						canGive = true;
+						canGive = false;
 						break;
 					case "Dict":
 						canGive = true;

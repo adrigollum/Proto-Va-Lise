@@ -5,6 +5,8 @@ public class Bouge : MonoBehaviour
 	public float moveSpeed = 5f;
 	public float rotationSpeed = 10f;
 
+	public float interactionDistance = 3f;
+
 	public float valiseDist = 2f;
 	public float valiseDec = 1f;
 	public float valiseDistHoldable = 3f;
@@ -19,11 +21,20 @@ public class Bouge : MonoBehaviour
 
 	public bool canGive;
 
+	
+	public Color outlineJo = Color.green;
+	public Color outlineGive = Color.green;
+
 	// Start is called before the first frame update
 	void Start()
 	{
 		jo = GameObject.FindGameObjectWithTag("jo");
 		rb = jo.GetComponent<Rigidbody>();
+
+		cam.GetComponent<Cam>().enabled = false;
+
+		ActivateOutline(jo, true);
+
 	}
 
 	private void Update()
@@ -97,33 +108,62 @@ public class Bouge : MonoBehaviour
 
 	void TryChangeCharacter()
 	{
-		Collider[] nearbyCharacters = Physics.OverlapSphere(jo.transform.position, 3f);
+		Collider[] nearbyCharacters = Physics.OverlapSphere(jo.transform.position, interactionDistance);
 		foreach (Collider col in nearbyCharacters)
 		{
-			if (col.GetComponent<allume>() == null)
+			if (col.GetComponent<allume>() == null )
 			{
+				
 				continue;
 			}
 			if (col.gameObject != jo)
 			{
-				NextRole(col.gameObject);
+				float distanceToJo = Vector3.Distance(jo.transform.position, col.gameObject.transform.position);
 
-				if (canGive)
+				if (distanceToJo <= 3f)
 				{
-					changement(col.gameObject);
+					NextRole(col.gameObject);
+
+					if (canGive)
+					{
+						changement(col.gameObject);
+					}
+					canGive = false;
+
+					break;
 				}
-				canGive = false;
 				
-				break;
 			}
 		}
 	}
 
 	public void changement(GameObject newjo)
 	{
+		// Désactiver l'outline de l'ancien joueur
+		ActivateOutline(jo, false);
+
+		// Mettre à jour le joueur actuel
 		jo = newjo;
 		rb = jo.GetComponent<Rigidbody>();
+
+		// Activer l'outline du nouveau joueur
+		ActivateOutline(jo, true);
 	}
+
+
+
+	void ActivateOutline(GameObject target, bool state)
+	{
+		Renderer renderer = target.GetComponent<Renderer>();
+		if (renderer != null)
+		{
+			Material mat = renderer.material;
+			mat.SetColor("_OutlineColor", state ? outlineJo : outlineGive);
+			mat.SetFloat("_OutlineWidth", state ? 0.05f : 0f);
+		}
+	}
+
+
 
 	public void NextRole(GameObject nextjo)
 	{
@@ -144,13 +184,13 @@ public class Bouge : MonoBehaviour
 						canGive = true;
 						break;
 					case Role.Choix.Dict:
-						canGive = true;
+						canGive = false;
 						break;
 					case Role.Choix.Bag:
 						canGive = true;
 						break;
 					case Role.Choix.Amb:
-						canGive = true;
+						canGive = false;
 						break;
 				}
 				
@@ -162,7 +202,7 @@ public class Bouge : MonoBehaviour
 				switch (nextjo.GetComponent<Role>().role)
 				{
 					case Role.Choix.Espion:
-						canGive = true;
+						canGive = false;
 						break;
 					case Role.Choix.Guarde:
 						canGive = false;
@@ -171,13 +211,13 @@ public class Bouge : MonoBehaviour
 						canGive = true;
 						break;
 					case Role.Choix.Dict:
-						canGive = true;
+						canGive = false;
 						break;
 					case Role.Choix.Bag:
 						canGive = true;
 						break;
 					case Role.Choix.Amb:
-						canGive = true;
+						canGive = false;
 						break;
 				}
 				break;
@@ -194,7 +234,7 @@ public class Bouge : MonoBehaviour
 						canGive = true;
 						break;
 					case Role.Choix.Dict:
-						canGive = true;
+						canGive = false;
 						break;
 					case Role.Choix.Bag:
 						canGive = true;
@@ -214,10 +254,10 @@ public class Bouge : MonoBehaviour
 						canGive = false;
 						break;
 					case Role.Choix.Elec:
-						canGive = true;
+						canGive = false;
 						break;
 					case Role.Choix.Dict:
-						canGive = true;
+						canGive = false;
 						break;
 					case Role.Choix.Bag:
 						canGive = true;
@@ -237,7 +277,7 @@ public class Bouge : MonoBehaviour
 						canGive = false;
 						break;
 					case Role.Choix.Elec:
-						canGive = true;
+						canGive = false;
 						break;
 					case Role.Choix.Dict:
 						canGive = true;
