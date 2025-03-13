@@ -22,7 +22,7 @@ public class Cam : MonoBehaviour
 		float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
 		xRotation -= mouseY;
-		xRotation = Mathf.Clamp(xRotation, -25f, 25); // Empêche la caméra de regarder complètement en arrière
+		xRotation = Mathf.Clamp(xRotation, -25f, 25);
 
 		transform.localRotation = Quaternion.Euler(xRotation, transform.localRotation.eulerAngles.y + mouseX, 0f);
 	}

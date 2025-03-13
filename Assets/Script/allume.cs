@@ -8,6 +8,8 @@ public class allume : MonoBehaviour
 	private Material outlineMaterial;
 	private bool isHighlighted = false;
 
+	public string rolejo;
+	private bool canGive = false;
 
 	void Start()
 	{
@@ -16,9 +18,13 @@ public class allume : MonoBehaviour
 
 	void Update()
 	{
-		if (valise.jo.transform != this.transform)
+		rolejo = valise.jo.GetComponent<Role>().role.ToString();
+		relat();
+
+		if (valise.jo.transform != this.transform && canGive)
 		{
 			float distance = Vector3.Distance(valise.jo.transform.position, transform.position);
+
 
 			if (distance <= detectionRadius)
 			{
@@ -52,5 +58,130 @@ public class allume : MonoBehaviour
 
 		if (objectRenderer != null)
 			outlineMaterial = objectRenderer.material;
+	}
+
+	void relat()
+	{
+		switch (GetComponent<Role>().role)
+		{
+			case Role.Choix.Espion:
+				switch (rolejo)
+				{
+					case "Espion":
+						canGive = true;
+						break;
+					case "Guarde":
+						canGive = false;
+						break;
+					case "Elec":
+						canGive = true;
+						break;
+					case "Dict":
+						canGive = true;
+						break;
+					case "Bag":
+						canGive = true;
+						break;
+					case "Amb":
+						canGive = true;
+						break;
+				}
+				break;
+			case Role.Choix.Guarde:
+				canGive = false;
+				break;
+			case Role.Choix.Elec:
+				switch (rolejo)
+				{
+					case "Espion":
+						canGive = true;
+						break;
+					case "Guarde":
+						canGive = false;
+						break;
+					case "Elec":
+						canGive = true;
+						break;
+					case "Dict":
+						canGive = true;
+						break;
+					case "Bag":
+						canGive = true;
+						break;
+					case "Amb":
+						canGive = true;
+						break;
+				}
+				break;
+			case Role.Choix.Dict:
+				switch (rolejo)
+				{
+					case "Espion":
+						canGive = true;
+						break;
+					case "Guarde":
+						canGive = false;
+						break;
+					case "Elec":
+						canGive = true;
+						break;
+					case "Dict":
+						canGive = true;
+						break;
+					case "Bag":
+						canGive = true;
+						break;
+					case "Amb":
+						canGive = true;
+						break;
+				}
+				break;
+			case Role.Choix.Bag:
+				switch (rolejo)
+				{
+					case "Espion":
+						canGive = true;
+						break;
+					case "Guarde":
+						canGive = false;
+						break;
+					case "Elec":
+						canGive = true;
+						break;
+					case "Dict":
+						canGive = true;
+						break;
+					case "Bag":
+						canGive = true;
+						break;
+					case "Amb":
+						canGive = true;
+						break;
+				}
+				break;
+			case Role.Choix.Amb:
+				switch (rolejo)
+				{
+					case "Espion":
+						canGive = true;
+						break;
+					case "Guarde":
+						canGive = false;
+						break;
+					case "Elec":
+						canGive = true;
+						break;
+					case "Dict":
+						canGive = true;
+						break;
+					case "Bag":
+						canGive = true;
+						break;
+					case "Amb":
+						canGive = true;
+						break;
+				}
+				break;
+		}
 	}
 }

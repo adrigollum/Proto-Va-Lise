@@ -17,6 +17,8 @@ public class Bouge : MonoBehaviour
 	public GameObject cam;
 	public float camLerpSpeed = 10f;
 
+	public bool canGive;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -90,6 +92,7 @@ public class Bouge : MonoBehaviour
 		{
 			gameObject.transform.position = joPos - jo.transform.forward * valiseDist;
 		}
+
 	}
 
 	void TryChangeCharacter()
@@ -103,7 +106,14 @@ public class Bouge : MonoBehaviour
 			}
 			if (col.gameObject != jo)
 			{
-				changement(col.gameObject);
+				NextRole(col.gameObject);
+
+				if (canGive)
+				{
+					changement(col.gameObject);
+				}
+				canGive = false;
+				
 				break;
 			}
 		}
@@ -113,5 +123,139 @@ public class Bouge : MonoBehaviour
 	{
 		jo = newjo;
 		rb = jo.GetComponent<Rigidbody>();
+	}
+
+	public void NextRole(GameObject nextjo)
+	{
+		
+
+		switch (jo.GetComponent<Role>().role)
+		{
+			case Role.Choix.Espion:
+				switch (nextjo.GetComponent<Role>().role)
+				{
+					case Role.Choix.Espion:
+						canGive = true;
+						break;
+					case Role.Choix.Guarde:
+						canGive = false;
+						break;
+					case Role.Choix.Elec:
+						canGive = true;
+						break;
+					case Role.Choix.Dict:
+						canGive = true;
+						break;
+					case Role.Choix.Bag:
+						canGive = true;
+						break;
+					case Role.Choix.Amb:
+						canGive = true;
+						break;
+				}
+				
+				break;
+			case Role.Choix.Guarde:
+				canGive = false;
+				break;
+			case Role.Choix.Elec:
+				switch (nextjo.GetComponent<Role>().role)
+				{
+					case Role.Choix.Espion:
+						canGive = true;
+						break;
+					case Role.Choix.Guarde:
+						canGive = false;
+						break;
+					case Role.Choix.Elec:
+						canGive = true;
+						break;
+					case Role.Choix.Dict:
+						canGive = true;
+						break;
+					case Role.Choix.Bag:
+						canGive = true;
+						break;
+					case Role.Choix.Amb:
+						canGive = true;
+						break;
+				}
+				break;
+			case Role.Choix.Dict:
+				switch (nextjo.GetComponent<Role>().role)
+				{
+					case Role.Choix.Espion:
+						canGive = true;
+						break;
+					case Role.Choix.Guarde:
+						canGive = false;
+						break;
+					case Role.Choix.Elec:
+						canGive = true;
+						break;
+					case Role.Choix.Dict:
+						canGive = true;
+						break;
+					case Role.Choix.Bag:
+						canGive = true;
+						break;
+					case Role.Choix.Amb:
+						canGive = true;
+						break;
+				}
+				break;
+			case Role.Choix.Bag:
+				switch (nextjo.GetComponent<Role>().role)
+				{
+					case Role.Choix.Espion:
+						canGive = true;
+						break;
+					case Role.Choix.Guarde:
+						canGive = false;
+						break;
+					case Role.Choix.Elec:
+						canGive = true;
+						break;
+					case Role.Choix.Dict:
+						canGive = true;
+						break;
+					case Role.Choix.Bag:
+						canGive = true;
+						break;
+					case Role.Choix.Amb:
+						canGive = true;
+						break;
+				}
+				break;
+			case Role.Choix.Amb:
+				switch (nextjo.GetComponent<Role>().role)
+				{
+					case Role.Choix.Espion:
+						canGive = true;
+						break;
+					case Role.Choix.Guarde:
+						canGive = false;
+						break;
+					case Role.Choix.Elec:
+						canGive = true;
+						break;
+					case Role.Choix.Dict:
+						canGive = true;
+						break;
+					case Role.Choix.Bag:
+						canGive = true;
+						break;
+					case Role.Choix.Amb:
+						canGive = true;
+						break;
+				}
+				break;
+		}
+
+
+
+
+
+
 	}
 }
