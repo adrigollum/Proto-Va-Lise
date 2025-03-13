@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.AI; // Pour que le garde puisse se déplacer
+
 
 public class Bouge : MonoBehaviour
 {
@@ -13,8 +15,10 @@ public class Bouge : MonoBehaviour
 
 	public bool isHold = false;
 
+	public bool canpickup = true;
+
 	public GameObject jo;
-	private Rigidbody rb;
+	public GameObject following;
 
 	public GameObject cam;
 	public float camLerpSpeed = 10f;
@@ -29,12 +33,19 @@ public class Bouge : MonoBehaviour
 	void Start()
 	{
 		jo = GameObject.FindGameObjectWithTag("jo");
-		rb = jo.GetComponent<Rigidbody>();
+
+		NavMeshAgent agent = jo.GetComponent<NavMeshAgent>();
+
+		// Désactive le NavMeshAgent
+		agent.enabled = false;
 
 		cam.GetComponent<Cam>().enabled = false;
 
 		ActivateOutline(jo, true);
 
+		canpickup = true;
+
+		following = jo;
 	}
 
 	private void Update()
@@ -49,9 +60,19 @@ public class Bouge : MonoBehaviour
 			cam.GetComponent<Cam>().enabled = !cam.GetComponent<Cam>().enabled;
 		}
 
-		if (Input.GetKeyDown(KeyCode.F) && (isHold || Vector3.Distance(jo.transform.position, transform.position) < valiseDistHoldable))
+		
+		if (canpickup)
 		{
-			isHold = !isHold;
+			if (Input.GetKeyDown(KeyCode.F) && (isHold || Vector3.Distance(jo.transform.position, transform.position) < valiseDistHoldable))
+			{
+				if (isHold)
+				{
+					DropValise();
+				} else
+				{
+					PickUpValise();
+				}
+			}
 		}
 	}
 
@@ -60,12 +81,15 @@ public class Bouge : MonoBehaviour
 		float moveX = Input.GetAxisRaw("Horizontal");
 		float moveZ = Input.GetAxisRaw("Vertical");
 
+
+		Vector3 folPos = following.transform.position;
 		Vector3 joPos = jo.transform.position;
 
 		if (isHold)
 		{
+			folPos = folPos + following.transform.right * valiseDec;
 			joPos = joPos + jo.transform.right * valiseDec;
-			if (moveZ < 0)
+			if (jo == following && moveZ < 0)
 			{
 				moveZ = 0;
 			}
@@ -89,6 +113,7 @@ public class Bouge : MonoBehaviour
 				);
 		}
 
+		Rigidbody rb = jo.GetComponent<Rigidbody>();
 		Vector3 newPosition = rb.position + movement * Time.fixedDeltaTime;
 		rb.MovePosition(newPosition);
 
@@ -101,7 +126,7 @@ public class Bouge : MonoBehaviour
 
 		if (isHold)
 		{
-			gameObject.transform.position = joPos - jo.transform.forward * valiseDist;
+			gameObject.transform.position = folPos - following.transform.forward * valiseDist;
 		}
 
 	}
@@ -137,6 +162,28 @@ public class Bouge : MonoBehaviour
 		}
 	}
 
+	public void PickUpValise()
+	{
+		// Désactive la physique (gravité et rotation) de la valise pour qu'elle ne tombe pas
+		Rigidbody valiseRb = this.GetComponent<Rigidbody>();
+		valiseRb.isKinematic = true; // Pas de physique appliquée
+		valiseRb.useGravity = false; // Empêche la gravité de l'affecter
+		isHold = true;
+	}
+
+	public void DropValise()
+	{
+		Rigidbody valiseRb = this.GetComponent<Rigidbody>();
+		valiseRb.isKinematic = false;
+		isHold = false;
+
+		// Réinitialise la rotation pour éviter une rotation bizarre
+		this.transform.rotation = Quaternion.identity;
+
+		// Applique une petite force pour faire tomber la valise correctement
+		valiseRb.AddForce(Vector3.down * 1f, ForceMode.Impulse);
+	}
+
 	public void changement(GameObject newjo)
 	{
 		// Désactiver l'outline de l'ancien joueur
@@ -144,7 +191,11 @@ public class Bouge : MonoBehaviour
 
 		// Mettre à jour le joueur actuel
 		jo = newjo;
-		rb = jo.GetComponent<Rigidbody>();
+
+		NavMeshAgent agent = jo.GetComponent<NavMeshAgent>();
+
+		// Désactive le NavMeshAgent
+		agent.enabled = false;
 
 		// Activer l'outline du nouveau joueur
 		ActivateOutline(jo, true);

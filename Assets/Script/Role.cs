@@ -25,6 +25,7 @@ public class Role : MonoBehaviour
 				if (matériaux.Count > 0)
 				{
 					GetComponent<Renderer>().material = matériaux[1];
+					this.gameObject.AddComponent<Guarde>();
 				}
 					break;
 			case Choix.Bag:

@@ -29,10 +29,7 @@ public class allume : MonoBehaviour
 
 			if (distance <= detectionRadius)
 			{
-				float distanceToJo = Vector3.Distance(transform.position, valise.jo.transform.position);
-
-				// Afficher la distance au moment du calcul dans la console
-				Debug.Log("Distance e : " + distanceToJo);
+				
 				if (!isHighlighted)
 				{
 					ActivateOutline(true);
