@@ -24,14 +24,18 @@ public class Bouge : MonoBehaviour
 	public float camLerpSpeed = 10f;
 
 	public bool canGive;
+	public bool guardepick;
 
-	
+
+
+
 	public Color outlineJo = Color.green;
 	public Color outlineGive = Color.green;
 
 	// Start is called before the first frame update
 	void Start()
 	{
+
 		jo = GameObject.FindGameObjectWithTag("jo");
 
 		NavMeshAgent agent = jo.GetComponent<NavMeshAgent>();
@@ -55,7 +59,7 @@ public class Bouge : MonoBehaviour
 			TryChangeCharacter();
 		}
 
-		if (Input.GetKeyDown(KeyCode.Q)) // Desactive script Cam et active lock cam
+		if (Input.GetKeyDown(KeyCode.Q) || Input.GetMouseButtonDown(1)) // Desactive script Cam et active lock cam
 		{
 			cam.GetComponent<Cam>().enabled = !cam.GetComponent<Cam>().enabled;
 		}
@@ -124,10 +128,12 @@ public class Bouge : MonoBehaviour
 			rb.MoveRotation(Quaternion.Lerp(rb.rotation, toRotation, Time.fixedDeltaTime * 10f));
 		}
 
-		if (isHold)
+
+		if (isHold && (guardepick || following == jo))
 		{
 			gameObject.transform.position = folPos - following.transform.forward * valiseDist;
 		}
+		
 
 	}
 
@@ -189,13 +195,20 @@ public class Bouge : MonoBehaviour
 		// Désactiver l'outline de l'ancien joueur
 		ActivateOutline(jo, false);
 
-		// Mettre à jour le joueur actuel
-		jo = newjo;
-
 		NavMeshAgent agent = jo.GetComponent<NavMeshAgent>();
 
 		// Désactive le NavMeshAgent
-		agent.enabled = false;
+		agent.enabled = true;
+
+		// Mettre à jour le joueur actuel
+		jo = newjo;
+
+		following = jo;
+
+		NavMeshAgent newagent = jo.GetComponent<NavMeshAgent>();
+
+		// Désactive le NavMeshAgent
+		newagent.enabled = false;
 
 		// Activer l'outline du nouveau joueur
 		ActivateOutline(jo, true);

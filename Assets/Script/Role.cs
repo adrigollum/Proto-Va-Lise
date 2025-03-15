@@ -24,14 +24,18 @@ public class Role : MonoBehaviour
 			case Choix.Guarde:
 				if (matériaux.Count > 0)
 				{
+					this.gameObject.tag = "Guard";
 					GetComponent<Renderer>().material = matériaux[1];
 					this.gameObject.AddComponent<Guarde>();
+					
 				}
 					break;
 			case Choix.Bag:
 				if (matériaux.Count > 0)
 				{
+					this.gameObject.tag = "Bagagiste";
 					GetComponent<Renderer>().material = matériaux[2];
+					this.gameObject.AddComponent<Bagagiste>();
 				}
 				break;
 			case Choix.Elec:

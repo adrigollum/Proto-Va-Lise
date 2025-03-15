@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - jo
+  - guardedepo
+  - Guard
+  - Bagagiste
   layers:
   - Default
   - TransparentFX

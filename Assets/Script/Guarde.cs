@@ -17,12 +17,30 @@ public class Guarde : MonoBehaviour
 
 	private NavMeshAgent agent; // Pour le déplacement du garde
 
+	public Transform dropOffPoint; // Point où il doit déposer la valise
+	public float dropOffRadius = 2f; // Rayon autour du point où il peut déposer
+
+	private Vector3 spawnPoint; // Point de spawn du garde
+
 
 	void Start()
 	{
+		spawnPoint = transform.position;
+
 		valise = this.gameObject.GetComponent<allume>().valise;
 
 		agent = GetComponent<NavMeshAgent>(); // Récupérer le composant NavMeshAgent
+
+		// Trouver le GameObject avec le tag "guardedepo"
+		GameObject dropOffObject = GameObject.FindGameObjectWithTag("guardedepo");
+		if (dropOffObject != null)
+		{
+			dropOffPoint = dropOffObject.transform;  // Assigner la position du dépôt
+		}
+		else
+		{
+			Debug.LogWarning("Aucun objet avec le tag 'guardedepo' trouvé !");
+		}
 
 		// Création et configuration du LineRenderer
 		lineRenderer = gameObject.AddComponent<LineRenderer>();
@@ -40,6 +58,18 @@ public class Guarde : MonoBehaviour
 		DetectPlayer();
 
 		DrawVisionCone();
+
+	}
+
+	public void ReactToPlayerWithValise()
+	{
+		// Vérifie si le joueur a bien la valise
+		if (valise.isHold)
+		{
+			// Faire en sorte que le garde se déplace vers la valise
+			Debug.Log("Le garde réagit et se dirige vers la valise !");
+			MoveToValise(); // Déplace le garde vers la valise (comportement similaire à celui lorsqu'il la récupère lui-même)
+		}
 	}
 
 	void DetectPlayer()
@@ -67,7 +97,7 @@ public class Guarde : MonoBehaviour
 
 		if (target && valise.isHold)
 		{
-			Debug.Log("Joueur détecté avec la valise ! Il doit la lâcher.");
+			
 			valise.canpickup = false; // Empêcher le joueur de reprendre la valise
 			valise.DropValise();
 
@@ -83,22 +113,61 @@ public class Guarde : MonoBehaviour
 
 	IEnumerator PickUpValise()
 	{
-		yield return new WaitUntil(() => agent.remainingDistance < valise.interactionDistance); // Attendre d'arriver à la valise
-		
-		Debug.Log("Le garde a récupéré la valise !");
-		valise.following = this.gameObject;
-		valise.PickUpValise();
+		yield return new WaitUntil(() =>
+			!agent.pathPending &&
+			agent.remainingDistance <= agent.stoppingDistance &&
+			agent.velocity.sqrMagnitude < 0.01f
+		);
 
-		StartCoroutine(DisablePickupForSeconds(10)); // Bloque la prise pendant 10 secondes
+		if (agent.remainingDistance <= agent.stoppingDistance)
+		{
+			valise.guardepick = true;
+			valise.following = this.gameObject;
+			valise.PickUpValise();
+
+			
+			MoveToDropOff();
+		}
 	}
 
-	IEnumerator DisablePickupForSeconds(float seconds)
+	/* IEnumerator DisablePickupForSeconds(float seconds)
 	{
 		yield return new WaitForSeconds(seconds);
 		valise.canpickup = true; // Réactive la possibilité de récupérer la valise
 		valise.DropValise();
+		valise.guardepick = false;
 		valise.following = valise.jo;
-		Debug.Log("Le joueur peut maintenant reprendre la valise.");
+	}
+	*/
+
+	IEnumerator DropValise()
+	{
+		yield return new WaitUntil(() =>
+			!agent.pathPending &&
+			agent.remainingDistance <= dropOffRadius &&
+			agent.velocity.sqrMagnitude < 0.01f
+		);
+
+		if (agent.remainingDistance <= dropOffRadius)
+		{
+			valise.canpickup = true; // Réactive la possibilité de récupérer la valise
+			valise.DropValise();
+			valise.guardepick = false;
+			valise.following = valise.jo;
+
+			MoveToSpawnPoint();
+		}
+	}
+
+	void MoveToSpawnPoint()
+	{
+		agent.SetDestination(spawnPoint); // Déplacer le garde vers son point de spawn
+	}
+
+	void MoveToDropOff()
+	{
+		agent.SetDestination(dropOffPoint.position);
+		StartCoroutine(DropValise());
 	}
 
 	void DrawVisionCone()
